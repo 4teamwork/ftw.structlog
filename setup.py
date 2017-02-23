@@ -38,6 +38,7 @@ setup(name='ftw.jsonlog',
 
       install_requires=[
           'setuptools',
+          'Zope2',
       ],
       tests_require=tests_require,
       extras_require=dict(tests=tests_require),

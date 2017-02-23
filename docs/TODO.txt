@@ -1,0 +1,6 @@
+- Have get_logfile_path() fail gracefully (what about during tests?)
+- Do we need to handle IPubFailure? EndRequestEvent?
+- Timestamp-Format? ISO? UTC? If not, TZ? Performance?
+- Is request['ACTUAL_URL'] appropriate? Query-String parameters?
+- Proxies / X-Forwarded-For?
+- Virtual Hosting?
