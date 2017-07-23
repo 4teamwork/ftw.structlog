@@ -46,13 +46,14 @@ def collect_data_to_log(request):
         'user': get_username(request),
         'timestamp': timestamp,
         'method': request.method,
-        'url': request.get('ACTUAL_URL'),
+        'url': get_url(request),
         'status': request.response.getStatus(),
         'bytes': get_content_length(request),
         'duration': duration,
         'referer': request.environ.get('HTTP_REFERER'),
         'user_agent': request.environ.get('HTTP_USER_AGENT'),
     }
+
     return logdata
 
 
@@ -66,3 +67,11 @@ def get_username(request):
     user = request.get('AUTHENTICATED_USER')
     if user:
         return user.getUserName()
+
+
+def get_url(request):
+    url = request.get('ACTUAL_URL')
+    qs = request.get('QUERY_STRING')
+    if qs:
+        url = url + "?" + qs
+    return url
