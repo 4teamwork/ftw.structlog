@@ -20,7 +20,7 @@ def handle_pub_start(event):
     timing.pub_start = time.time()
 
 
-def handle_pub_success(event):
+def handle_pub_end(event):
     try:
         log_request(event)
     except Exception as exc:

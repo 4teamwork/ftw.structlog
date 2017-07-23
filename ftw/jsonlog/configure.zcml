@@ -8,7 +8,12 @@
 
   <subscriber
       for="ZPublisher.interfaces.IPubSuccess"
-      handler=".subscribers.handle_pub_success"
+      handler=".subscribers.handle_pub_end"
+      />
+
+  <subscriber
+      for="ZPublisher.interfaces.IPubFailure"
+      handler=".subscribers.handle_pub_end"
       />
 
 </configure>
