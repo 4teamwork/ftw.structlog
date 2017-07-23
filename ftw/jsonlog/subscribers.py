@@ -13,10 +13,12 @@ root_logger = logging.root
 # Thread-local object to keep track of request duration
 timing = local()
 timing.pub_start = None
+timing.timestamp = None
 
 
 def handle_pub_start(event):
     global timing
+    timing.timestamp = datetime.now().isoformat()
     timing.pub_start = time.time()
 
 
@@ -40,11 +42,10 @@ def collect_data_to_log(request):
     duration = time.time() - timing.pub_start
     timing.pub_start = None
 
-    timestamp = datetime.now().isoformat()
     logdata = {
         'host': request.environ.get('REMOTE_ADDR'),
         'user': get_username(request),
-        'timestamp': timestamp,
+        'timestamp': timing.timestamp,
         'method': request.method,
         'url': request.get('ACTUAL_URL'),
         'status': request.response.getStatus(),
