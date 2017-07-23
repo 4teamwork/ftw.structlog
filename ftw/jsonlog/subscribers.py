@@ -42,7 +42,7 @@ def collect_data_to_log(request):
 
     timestamp = datetime.now().isoformat()
     logdata = {
-        'host': request.environ.get('REMOTE_ADDR'),
+        'host': request.getClientAddr(),
         'user': get_username(request),
         'timestamp': timestamp,
         'method': request.method,
