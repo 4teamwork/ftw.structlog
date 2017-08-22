@@ -26,7 +26,7 @@ def get_logfile_path():
     zconf = getConfiguration()
     handler_factories = zconf.eventlog.handler_factories
     eventlog_path = handler_factories[0].section.path
-    path = eventlog_path.replace('.log', '.json.log')
+    path = eventlog_path.replace('.log', '-json.log')
     return path
 
 
