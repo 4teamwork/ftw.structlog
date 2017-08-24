@@ -120,3 +120,17 @@ class TestLogging(FunctionalTestCase):
         self.assertEquals(
             u'http://localhost:55001/plone',
             log_entry['referer'])
+
+    @browsing
+    def test_logs_user_agent(self, browser):
+        browser.login()
+
+        # Default user agent from requests module
+        browser.open(self.portal)
+        log_entry = self.get_log_entries()[-1]
+        self.assertTrue(log_entry['user_agent'].startswith('python-requests'))
+
+        # Custom user agent
+        browser.open(self.portal, headers={'User-Agent': 'foobar/3.1415'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals('foobar/3.1415', log_entry['user_agent'])
