@@ -101,8 +101,13 @@ class TestLogging(FunctionalTestCase):
         log_entry = self.get_log_entries()[-1]
         self.assertEquals(500, log_entry['status'])
 
-        # TODO: Ask jone whether we can actually simulate a 401 here
-        # TODO: Test 30x (redirects). Needs a change in ftw.testbrowser
+        browser.open(view='@@unauthorized')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(401, log_entry['status'])
+
+        browser.open(view='@@redirect')
+        log_entry = self.get_log_entries()[-2]
+        self.assertEquals(302, log_entry['status'])
 
         browser.open(view='@@doesnt-exist')
         log_entry = self.get_log_entries()[-1]

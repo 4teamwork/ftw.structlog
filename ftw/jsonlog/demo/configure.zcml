@@ -20,6 +20,20 @@
 
     <browser:page
         for="*"
+        name="unauthorized"
+        class=".views.Unauthorized"
+        permission="zope.Public"
+        />
+
+    <browser:page
+        for="*"
+        name="redirect"
+        class=".views.Redirect"
+        permission="zope.Public"
+        />
+
+    <browser:page
+        for="*"
         name="send-100-bytes"
         class=".views.SendHundredBytes"
         permission="zope.Public"
