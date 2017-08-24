@@ -104,3 +104,19 @@ class TestLogging(FunctionalTestCase):
         browser.open(view='@@doesnt-exist')
         log_entry = self.get_log_entries()[-1]
         self.assertEquals(404, log_entry['status'])
+
+    @browsing
+    def test_logs_referer(self, browser):
+        browser.login()
+
+        # First request, no referer
+        browser.open(self.portal)
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(None, log_entry['referer'])
+
+        # Send referer with second request
+        browser.open(view='@@ping', referer=True)
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(
+            u'http://localhost:55001/plone',
+            log_entry['referer'])
