@@ -134,3 +134,13 @@ class TestLogging(FunctionalTestCase):
         browser.open(self.portal, headers={'User-Agent': 'foobar/3.1415'})
         log_entry = self.get_log_entries()[-1]
         self.assertEquals('foobar/3.1415', log_entry['user_agent'])
+
+    @browsing
+    def test_logs_timestamp(self, browser):
+        browser.login()
+
+        with freeze(datetime(2017, 7, 29, 12, 30, 58, 750)):
+            browser.open(self.portal)
+
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'2017-07-29T12:30:58.000750', log_entry['timestamp'])
