@@ -8,6 +8,7 @@ tests_require = [
     'ftw.testing',
     'ftw.testbrowser',
     'requests_toolbelt',
+    'plone.rest',
 ]
 
 

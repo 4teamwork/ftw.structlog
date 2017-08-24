@@ -87,6 +87,7 @@ class JSONLogLayer(PloneSandboxLayer):
             '  <include package="z3c.autoinclude" file="meta.zcml" />'
             '  <includePlugins package="plone" />'
             '  <includePluginsOverrides package="plone" />'
+            '  <include package="plone.rest" />'
             '  <include package="ftw.jsonlog.demo" />'
             '</configure>',
             context=configurationContext)

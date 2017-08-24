@@ -1,4 +1,6 @@
+from plone.rest import Service
 from Products.Five.browser import BrowserView
+import json
 
 
 class Ping(BrowserView):
@@ -30,3 +32,10 @@ class SendHundredBytes(BrowserView):
 
     def __call__(self):
         return 'x' * 100
+
+
+class RESTEndpoint(Service):
+
+    def render(self):
+        self.request.response.setHeader("Content-Type", "application/json")
+        return json.dumps({'status': 'ok'})

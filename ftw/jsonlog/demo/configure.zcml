@@ -2,6 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="ftw.jsonlog.demo">
 
     <browser:page
@@ -38,5 +39,41 @@
         class=".views.SendHundredBytes"
         permission="zope.Public"
         />
+
+    <plone:service
+        method="PUT"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        factory=".views.RESTEndpoint"
+        accept='application/json'
+        name='@rest-endpoint'
+        permission="zope.Public"
+      />
+
+    <plone:service
+        method="PATCH"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        factory=".views.RESTEndpoint"
+        accept='application/json'
+        name='@rest-endpoint'
+        permission="zope.Public"
+      />
+
+    <plone:service
+        method="DELETE"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        factory=".views.RESTEndpoint"
+        accept='application/json'
+        name='@rest-endpoint'
+        permission="zope.Public"
+      />
+
+    <plone:service
+        method="HEAD"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        factory=".views.RESTEndpoint"
+        accept='application/json'
+        name='@rest-endpoint'
+        permission="zope.Public"
+      />
 
 </configure>

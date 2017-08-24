@@ -66,7 +66,25 @@ class TestLogging(FunctionalTestCase):
         log_entry = self.get_log_entries()[-1]
         self.assertEquals(u'POST', log_entry['method'])
 
-        # TODO: Test more HTTP methods using plone.rest
+        browser.open(view='@rest-endpoint', method='PUT',
+                     headers={'Accept': 'application/json'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(u'PUT', log_entry['method'])
+
+        browser.open(view='@rest-endpoint', method='PATCH',
+                     headers={'Accept': 'application/json'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(u'PATCH', log_entry['method'])
+
+        browser.open(view='@rest-endpoint', method='DELETE',
+                     headers={'Accept': 'application/json'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(u'DELETE', log_entry['method'])
+
+        browser.open(view='@rest-endpoint', method='HEAD',
+                     headers={'Accept': 'application/json'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(u'HEAD', log_entry['method'])
 
     @browsing
     def test_logs_url(self, browser):
