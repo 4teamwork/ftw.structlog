@@ -3,6 +3,7 @@ from ftw.jsonlog.tests import FunctionalTestCase
 from ftw.testbrowser import browsing
 from ftw.testing import freeze
 from operator import itemgetter
+from plone.app.testing import TEST_USER_NAME
 
 
 class TestLogging(FunctionalTestCase):
@@ -34,3 +35,18 @@ class TestLogging(FunctionalTestCase):
         self.assertEquals(
             [u'2017-07-29T12:30:58.000750', u'2017-07-29T12:35:58.000750'],
             map(itemgetter('timestamp'), log_entries))
+
+    @browsing
+    def test_logs_username_for_authenticated_user(self, browser):
+        browser.login()
+        browser.open(self.portal)
+
+        log_entry = self.get_log_entries()[0]
+        self.assertEquals(TEST_USER_NAME, log_entry['user'])
+
+    @browsing
+    def test_logs_username_for_anonymous(self, browser):
+        browser.open(self.portal)
+
+        log_entry = self.get_log_entries()[0]
+        self.assertEquals(u'Anonymous User', log_entry['user'])

@@ -51,7 +51,7 @@ class JSONLogLayer(PloneSandboxLayer):
 
     def setup_eventlog(self):
         """Create an eventlog ZConfig configuration and patch it onto the
-        global config, so its present when ftw.jsonlog attempts to read it
+        global config, so it's present when ftw.jsonlog attempts to read it
         to derive its own logfile path from the eventlog's logfile path.
         """
         schema = ZConfig.loadSchemaFile(StringIO("""
