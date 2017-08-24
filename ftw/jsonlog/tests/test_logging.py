@@ -4,6 +4,9 @@ from ftw.testbrowser import browsing
 from ftw.testing import freeze
 from operator import itemgetter
 from plone.app.testing import TEST_USER_NAME
+from requests_toolbelt.adapters.source import SourceAddressAdapter
+import sys
+import unittest
 
 
 class TestLogging(FunctionalTestCase):
@@ -160,3 +163,24 @@ class TestLogging(FunctionalTestCase):
 
         log_entry = self.get_log_entries()[-1]
         self.assertEquals(100, log_entry['bytes'])
+
+    @browsing
+    def test_logs_standard_source_address(self, browser):
+        browser.login()
+
+        # Standard source address
+        browser.open(self.portal)
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual('127.0.0.1', log_entry['host'])
+
+    # Mac OS rejects source addresses other than 127.0.0.1 from the loopback
+    # interface with "[Errno 49] Can't assign requested address"
+    @unittest.skipIf(sys.platform == 'darwin', "Can't test this on Mac OS")
+    @browsing
+    def test_logs_different_source_address(self, browser):
+        source = SourceAddressAdapter('127.0.0.42')
+        browser.get_driver().requests_session.mount('http://', source)
+
+        browser.open('http://localhost:%s/plone' % self.zserver_port)
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual('127.0.0.42', log_entry['host'])

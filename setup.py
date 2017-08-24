@@ -7,6 +7,7 @@ tests_require = [
     'unittest2',
     'ftw.testing',
     'ftw.testbrowser',
+    'requests_toolbelt',
 ]
 
 
