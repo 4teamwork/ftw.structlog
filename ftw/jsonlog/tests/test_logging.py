@@ -50,3 +50,17 @@ class TestLogging(FunctionalTestCase):
 
         log_entry = self.get_log_entries()[0]
         self.assertEquals(u'Anonymous User', log_entry['user'])
+
+    @browsing
+    def test_logs_request_methods(self, browser):
+        browser.login()
+
+        browser.open(view='@@ping')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(u'GET', log_entry['method'])
+
+        browser.open(view='@@ping', method='POST')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(u'POST', log_entry['method'])
+
+        # TODO: Test more HTTP methods using plone.rest
