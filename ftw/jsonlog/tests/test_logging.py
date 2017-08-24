@@ -64,3 +64,23 @@ class TestLogging(FunctionalTestCase):
         self.assertEquals(u'POST', log_entry['method'])
 
         # TODO: Test more HTTP methods using plone.rest
+
+    @browsing
+    def test_logs_url(self, browser):
+        browser.login()
+
+        browser.open(view='@@ping')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(
+            u'http://localhost:55001/plone/@@ping',
+            log_entry['url'])
+
+    @browsing
+    def test_logs_url_with_query_string(self, browser):
+        browser.login()
+
+        browser.open(view='@@ping?foo=bar')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(
+            u'http://localhost:55001/plone/@@ping?foo=bar',
+            log_entry['url'])
