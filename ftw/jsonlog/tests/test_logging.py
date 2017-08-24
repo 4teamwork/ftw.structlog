@@ -84,3 +84,23 @@ class TestLogging(FunctionalTestCase):
         self.assertEquals(
             u'http://localhost:55001/plone/@@ping?foo=bar',
             log_entry['url'])
+
+    @browsing
+    def test_logs_reponse_status(self, browser):
+        browser.login()
+        browser.raise_http_errors = False
+
+        browser.open(view='@@ping')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(200, log_entry['status'])
+
+        browser.open(view='@@internal-server-error')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(500, log_entry['status'])
+
+        # TODO: Ask jone whether we can actually simulate a 401 here
+        # TODO: Test 30x (redirects). Needs a change in ftw.testbrowser
+
+        browser.open(view='@@doesnt-exist')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(404, log_entry['status'])

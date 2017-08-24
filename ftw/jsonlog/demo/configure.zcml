@@ -11,4 +11,11 @@
         permission="zope.Public"
         />
 
+    <browser:page
+        for="*"
+        name="internal-server-error"
+        class=".views.InternalServerError"
+        permission="zope.Public"
+        />
+
 </configure>
