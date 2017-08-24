@@ -144,3 +144,11 @@ class TestLogging(FunctionalTestCase):
 
         log_entry = self.get_log_entries()[-1]
         self.assertEqual(u'2017-07-29T12:30:58.000750', log_entry['timestamp'])
+
+    @browsing
+    def test_logs_duration(self, browser):
+        browser.login()
+        browser.open(self.portal)
+
+        log_entry = self.get_log_entries()[-1]
+        self.assertIsInstance(log_entry['duration'], float)
