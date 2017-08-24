@@ -11,3 +11,9 @@ class InternalServerError(BrowserView):
 
     def __call__(self):
         raise Exception('Boom')
+
+
+class SendHundredBytes(BrowserView):
+
+    def __call__(self):
+        return 'x' * 100

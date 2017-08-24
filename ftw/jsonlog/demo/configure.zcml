@@ -18,4 +18,11 @@
         permission="zope.Public"
         />
 
+    <browser:page
+        for="*"
+        name="send-100-bytes"
+        class=".views.SendHundredBytes"
+        permission="zope.Public"
+        />
+
 </configure>

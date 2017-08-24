@@ -152,3 +152,11 @@ class TestLogging(FunctionalTestCase):
 
         log_entry = self.get_log_entries()[-1]
         self.assertIsInstance(log_entry['duration'], float)
+
+    @browsing
+    def test_logs_response_content_length_in_bytes(self, browser):
+        browser.login()
+        browser.open(self.portal, view='send-100-bytes')
+
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(100, log_entry['bytes'])
