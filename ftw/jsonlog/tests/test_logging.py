@@ -72,7 +72,7 @@ class TestLogging(FunctionalTestCase):
         browser.open(view='@@ping')
         log_entry = self.get_log_entries()[-1]
         self.assertEquals(
-            u'http://localhost:55001/plone/@@ping',
+            u'http://localhost:%s/plone/@@ping' % self.zserver_port,
             log_entry['url'])
 
     @browsing
@@ -82,7 +82,7 @@ class TestLogging(FunctionalTestCase):
         browser.open(view='@@ping?foo=bar')
         log_entry = self.get_log_entries()[-1]
         self.assertEquals(
-            u'http://localhost:55001/plone/@@ping?foo=bar',
+            u'http://localhost:%s/plone/@@ping?foo=bar' % self.zserver_port,
             log_entry['url'])
 
     @browsing
@@ -118,7 +118,7 @@ class TestLogging(FunctionalTestCase):
         browser.open(view='@@ping', referer=True)
         log_entry = self.get_log_entries()[-1]
         self.assertEquals(
-            u'http://localhost:55001/plone',
+            u'http://localhost:%s/plone' % self.zserver_port,
             log_entry['referer'])
 
     @browsing
