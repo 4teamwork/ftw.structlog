@@ -1,0 +1,79 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="ftw.jsonlog.demo">
+
+    <browser:page
+        for="*"
+        name="ping"
+        class=".views.Ping"
+        permission="zope.Public"
+        />
+
+    <browser:page
+        for="*"
+        name="internal-server-error"
+        class=".views.InternalServerError"
+        permission="zope.Public"
+        />
+
+    <browser:page
+        for="*"
+        name="unauthorized"
+        class=".views.Unauthorized"
+        permission="zope.Public"
+        />
+
+    <browser:page
+        for="*"
+        name="redirect"
+        class=".views.Redirect"
+        permission="zope.Public"
+        />
+
+    <browser:page
+        for="*"
+        name="send-100-bytes"
+        class=".views.SendHundredBytes"
+        permission="zope.Public"
+        />
+
+    <plone:service
+        method="PUT"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        factory=".views.RESTEndpoint"
+        accept='application/json'
+        name='@rest-endpoint'
+        permission="zope.Public"
+      />
+
+    <plone:service
+        method="PATCH"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        factory=".views.RESTEndpoint"
+        accept='application/json'
+        name='@rest-endpoint'
+        permission="zope.Public"
+      />
+
+    <plone:service
+        method="DELETE"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        factory=".views.RESTEndpoint"
+        accept='application/json'
+        name='@rest-endpoint'
+        permission="zope.Public"
+      />
+
+    <plone:service
+        method="HEAD"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        factory=".views.RESTEndpoint"
+        accept='application/json'
+        name='@rest-endpoint'
+        permission="zope.Public"
+      />
+
+</configure>

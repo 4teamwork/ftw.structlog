@@ -5,6 +5,10 @@ version = '0.1.0.dev0'
 
 tests_require = [
     'unittest2',
+    'ftw.testing',
+    'ftw.testbrowser',
+    'requests_toolbelt',
+    'plone.rest',
 ]
 
 
