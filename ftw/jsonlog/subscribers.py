@@ -1,6 +1,7 @@
 from datetime import datetime
 from ftw.jsonlog.logger import setup_logger
 from threading import local
+from zope.component.hooks import getSite
 import json
 import logging
 import time
@@ -44,6 +45,7 @@ def collect_data_to_log(request):
 
     logdata = {
         'host': request.getClientAddr(),
+        'site': get_site_id(),
         'user': get_username(request),
         'timestamp': timing.timestamp,
         'method': request.method,
@@ -63,6 +65,13 @@ def get_content_length(request):
     content_length = request.response.getHeader('Content-Length')
     if content_length:
         return int(content_length)
+
+
+def get_site_id():
+    site = getSite()
+    if site:
+        return site.id
+    return ''
 
 
 def get_username(request):

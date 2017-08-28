@@ -19,8 +19,8 @@ class TestLogging(FunctionalTestCase):
 
         log_entry = self.get_log_entries()[-1]
 
-        self.assertEquals(
-            [u'status', u'url', u'timestamp', u'bytes', u'host',
+        self.assertItemsEqual(
+            [u'status', u'url', u'timestamp', u'bytes', u'host', u'site',
              u'referer', u'user', u'duration', u'method', u'user_agent'],
             log_entry.keys())
 
@@ -38,6 +38,13 @@ class TestLogging(FunctionalTestCase):
         self.assertEquals(
             [u'2017-07-29T12:30:58.000750', u'2017-07-29T12:35:58.000750'],
             map(itemgetter('timestamp'), log_entries))
+
+    @browsing
+    def test_logs_plone_site_id(self, browser):
+        browser.open(self.portal)
+
+        log_entry = self.get_log_entries()[0]
+        self.assertEquals(u'plone', log_entry['site'])
 
     @browsing
     def test_logs_username_for_authenticated_user(self, browser):
