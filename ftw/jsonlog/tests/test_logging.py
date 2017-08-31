@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import timedelta
+from freezegun import freeze_time
 from ftw.jsonlog.tests import FunctionalTestCase
 from ftw.testbrowser import browsing
-from ftw.testing import freeze
 from operator import itemgetter
 from plone.app.testing import TEST_USER_NAME
 from requests_toolbelt.adapters.source import SourceAddressAdapter
@@ -14,8 +14,7 @@ class TestLogging(FunctionalTestCase):
     @browsing
     def test_logs_basic_request_infos(self, browser):
         browser.login()
-        with freeze(datetime(2017, 7, 29, 12, 30, 58, 750)):
-            browser.open(self.portal)
+        browser.open(self.portal)
 
         log_entry = self.get_log_entries()[-1]
 
@@ -27,16 +26,20 @@ class TestLogging(FunctionalTestCase):
     @browsing
     def test_logs_multiple_requests(self, browser):
         browser.login()
-        with freeze(datetime(2017, 7, 29, 12, 30, 58, 750)) as clock:
+        # Frozen time is specified in UTC
+        # tz_offset specifies what offset to UTC the local tz is supposed to
+        # have (relevant for stdlib functions that return local times)
+        with freeze_time("2017-07-29 10:30:58.000750", tz_offset=2) as clock:
             browser.open(self.portal)
-            clock.forward(minutes=5)
+            clock.tick(timedelta(minutes=5))
             browser.open(self.portal)
 
         log_entries = self.get_log_entries()
 
         self.assertEquals(2, len(log_entries))
         self.assertEquals(
-            [u'2017-07-29T12:30:58.000750', u'2017-07-29T12:35:58.000750'],
+            [u'2017-07-29T12:30:58.000750',
+             u'2017-07-29T12:35:58.000750'],
             map(itemgetter('timestamp'), log_entries))
 
     @browsing
@@ -172,11 +175,15 @@ class TestLogging(FunctionalTestCase):
     def test_logs_timestamp(self, browser):
         browser.login()
 
-        with freeze(datetime(2017, 7, 29, 12, 30, 58, 750)):
+        # Frozen time is specified in UTC
+        # tz_offset specifies what offset to UTC the local tz is supposed to
+        # have (relevant for stdlib functions that return local times)
+        with freeze_time("2017-07-29 10:30:58.000750", tz_offset=2):
             browser.open(self.portal)
 
         log_entry = self.get_log_entries()[-1]
-        self.assertEqual(u'2017-07-29T12:30:58.000750', log_entry['timestamp'])
+        self.assertEqual(u'2017-07-29T12:30:58.000750',
+                         log_entry['timestamp'])
 
     @browsing
     def test_logs_duration(self, browser):
