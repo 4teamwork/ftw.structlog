@@ -1,6 +1,7 @@
 from datetime import datetime
 from ftw.jsonlog.logger import setup_logger
 from threading import local
+from tzlocal import get_localzone
 from zope.component.hooks import getSite
 import json
 import logging
@@ -8,7 +9,7 @@ import pytz
 import time
 
 
-LOG_TZ = pytz.timezone('Europe/Zurich')
+LOG_TZ = get_localzone()
 
 json_log = setup_logger()
 root_logger = logging.root

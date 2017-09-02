@@ -38,7 +38,7 @@ Example entry:
       "referer": "http:\/\/localhost:8080\/plone",
       "site": "plone",
       "status": 200,
-      "timestamp": "2017-08-28T13:52:52.895637",
+      "timestamp": "2017-07-29T12:30:58.000750+02:00",
       "url": "http:\/\/localhost:8080\/plone\/my-page",
       "user": "john.doe",
       "user_agent": "Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/60.0.3112.113 Safari\/537.36"
@@ -66,7 +66,9 @@ The logged JSON entry contains the following data:
 +------------+---------------------------------------------------------------+
 | status     | HTTP response status                                          |
 +------------+---------------------------------------------------------------+
-| timestamp  | Time when request was received (local time in ISO 8601)       |
+| timestamp  | Time when request was received (non-naive local time in ISO   |
+|            | 8601, in the server's local timezone as determined by         |
+|            | ``tzlocal``)                                                  |
 +------------+---------------------------------------------------------------+
 | url        | URL of the request (including query string if present)        |
 +------------+---------------------------------------------------------------+

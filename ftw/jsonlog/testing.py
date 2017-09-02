@@ -7,6 +7,7 @@ from plone.testing import z2
 from StringIO import StringIO
 from zope.configuration import xmlconfig
 import os
+import pytz
 import tempfile
 import ZConfig
 
@@ -17,6 +18,24 @@ def get_log_path():
     logger = getLogger('ftw.jsonlog')
     jsonlog_path = logger.handlers[0].stream.name
     return jsonlog_path
+
+
+class PatchedLogTZ(object):
+    """Context manager that patches LOG_TZ to a given timezone.
+    """
+
+    def __init__(self, tzname):
+        self.new_tz = pytz.timezone(tzname)
+
+    def __enter__(self):
+        from ftw.jsonlog import subscribers
+        self._original_log_tz = subscribers.LOG_TZ
+        subscribers.LOG_TZ = self.new_tz
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        from ftw.jsonlog import subscribers
+        subscribers.LOG_TZ = self._original_log_tz
 
 
 class JSONLogLayer(PloneSandboxLayer):
