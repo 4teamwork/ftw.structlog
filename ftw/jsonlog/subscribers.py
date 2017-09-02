@@ -1,11 +1,15 @@
 from datetime import datetime
 from ftw.jsonlog.logger import setup_logger
 from threading import local
+from tzlocal import get_localzone
 from zope.component.hooks import getSite
 import json
 import logging
+import pytz
 import time
 
+
+LOG_TZ = get_localzone()
 
 json_log = setup_logger()
 root_logger = logging.root
@@ -19,7 +23,10 @@ timing.timestamp = None
 
 def handle_pub_start(event):
     global timing
-    timing.timestamp = datetime.now().isoformat()
+    # Get time in UTC, make non-naive, and convert to local time for logging
+    ts = datetime.utcnow().replace(tzinfo=pytz.utc)
+    timing.timestamp = ts.astimezone(LOG_TZ).isoformat()
+
     timing.pub_start = time.time()
 
 

@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import timedelta
+from freezegun import freeze_time
+from ftw.jsonlog.testing import PatchedLogTZ
 from ftw.jsonlog.tests import FunctionalTestCase
 from ftw.testbrowser import browsing
-from ftw.testing import freeze
 from operator import itemgetter
 from plone.app.testing import TEST_USER_NAME
 from requests_toolbelt.adapters.source import SourceAddressAdapter
@@ -14,8 +15,7 @@ class TestLogging(FunctionalTestCase):
     @browsing
     def test_logs_basic_request_infos(self, browser):
         browser.login()
-        with freeze(datetime(2017, 7, 29, 12, 30, 58, 750)):
-            browser.open(self.portal)
+        browser.open(self.portal)
 
         log_entry = self.get_log_entries()[-1]
 
@@ -27,16 +27,22 @@ class TestLogging(FunctionalTestCase):
     @browsing
     def test_logs_multiple_requests(self, browser):
         browser.login()
-        with freeze(datetime(2017, 7, 29, 12, 30, 58, 750)) as clock:
-            browser.open(self.portal)
-            clock.forward(minutes=5)
-            browser.open(self.portal)
+        # Frozen time is specified in UTC
+        # tz_offset specifies what offset to UTC the local tz is supposed to
+        # have. This is relevant for stdlib functions that return local times,
+        # but *not* for ftw.jsonlog, since we never fetch local times
+        with freeze_time("2017-07-29 10:30:58.000750", tz_offset=7) as clock:
+            with PatchedLogTZ('Europe/Zurich'):
+                browser.open(self.portal)
+                clock.tick(timedelta(minutes=5))
+                browser.open(self.portal)
 
         log_entries = self.get_log_entries()
 
         self.assertEquals(2, len(log_entries))
         self.assertEquals(
-            [u'2017-07-29T12:30:58.000750', u'2017-07-29T12:35:58.000750'],
+            [u'2017-07-29T12:30:58.000750+02:00',
+             u'2017-07-29T12:35:58.000750+02:00'],
             map(itemgetter('timestamp'), log_entries))
 
     @browsing
@@ -172,11 +178,83 @@ class TestLogging(FunctionalTestCase):
     def test_logs_timestamp(self, browser):
         browser.login()
 
-        with freeze(datetime(2017, 7, 29, 12, 30, 58, 750)):
-            browser.open(self.portal)
+        # Frozen time is specified in UTC
+        # tz_offset specifies what offset to UTC the local tz is supposed to
+        # have. This is relevant for stdlib functions that return local times,
+        # but *not* for ftw.jsonlog, since we never fetch local times
+        with freeze_time("2017-07-29 10:30:58.000750", tz_offset=7):
+            with PatchedLogTZ('Europe/Zurich'):
+                browser.open(self.portal)
 
         log_entry = self.get_log_entries()[-1]
-        self.assertEqual(u'2017-07-29T12:30:58.000750', log_entry['timestamp'])
+        self.assertEqual(u'2017-07-29T12:30:58.000750+02:00',
+                         log_entry['timestamp'])
+
+    @browsing
+    def test_logs_timestamp_in_tz_aware_local_time(self, browser):
+        browser.login()
+
+        # Frozen time is specified in UTC
+        # tz_offset specifies what offset to UTC the local tz is supposed to
+        # have. This is relevant for stdlib functions that return local times,
+        # but *not* for ftw.jsonlog, since we never fetch local times
+        with freeze_time("2017-07-29 10:30:58.000750", tz_offset=7):
+            with PatchedLogTZ('Europe/Athens'):
+                browser.open(self.portal)
+
+        # ftw.jsonlog shouldn consider the system's local TZ for logging.
+        # The local TZ will be determined by the tzlocal module and set to
+        # LOG_TZ, which we patch here to test representation in a "local" TZ
+        # which isn't the one on our CI server or dev machines.
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'2017-07-29T13:30:58.000750+03:00',
+                         log_entry['timestamp'])
+
+    @browsing
+    def test_dst_rollover(self, browser):
+        browser.login()
+
+        # Start in winter (no DST), half an hour before switch to DST, which
+        # will happen at 2017-03-26 01:00:00 UTC / 2017-03-26 02:00:00 CET
+        # for Europe/Zurich
+        with freeze_time("2017-03-26 00:30:00.000750", tz_offset=7) as clock, \
+                PatchedLogTZ('Europe/Zurich'):
+            browser.open(self.portal)
+
+            # No DST (winter) - UTC offset for Europe/Zurich should be +01:00
+            log_entry = self.get_log_entries()[-1]
+            self.assertEqual(u'2017-03-26T01:30:00.000750+01:00',
+                             log_entry['timestamp'])
+
+            # Forward one hour - rollover from winter to summer, it's now DST
+            clock.tick(timedelta(hours=1))
+            browser.open(self.portal)
+
+            # DST (summer) - UTC offset for Europe/Zurich should be +02:00,
+            # and we "magically" skipped the hourd from 02:00 - 03:00
+            log_entry = self.get_log_entries()[-1]
+            self.assertEqual(u'2017-03-26T03:30:00.000750+02:00',
+                             log_entry['timestamp'])
+
+            # Fast forward to October, half an hour before end of DST
+            clock.move_to("2017-10-29 00:30:00.000750")
+            browser.open(self.portal)
+
+            # We're still just in DST (summer) - UTC offset for
+            # Europe/Zurich should be +02:00
+            log_entry = self.get_log_entries()[-1]
+            self.assertEqual(u'2017-10-29T02:30:00.000750+02:00',
+                             log_entry['timestamp'])
+
+            # Forward one hour - rollover from summer to winter, DST ends
+            clock.tick(timedelta(hours=1))
+            browser.open(self.portal)
+
+            # No DST (winter) - UTC offset for Europe/Zurich should be +01:00,
+            # and it's now "magically" 02:30 again, even though an hour passed
+            log_entry = self.get_log_entries()[-1]
+            self.assertEqual(u'2017-10-29T02:30:00.000750+01:00',
+                             log_entry['timestamp'])
 
     @browsing
     def test_logs_duration(self, browser):
