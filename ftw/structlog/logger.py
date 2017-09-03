@@ -7,6 +7,8 @@ import logging
 
 logger = getLogger('ftw.structlog')
 
+root_logger = logging.root
+
 
 def setup_logger():
     """Set up logger that writes to the JSON based logfile.
@@ -15,10 +17,11 @@ def setup_logger():
     """
     if not logger.handlers:
         path = get_logfile_path()
-        handler = FileHandler(path)
-        logger.addHandler(handler)
-        logger.setLevel(logging.INFO)
-        logger.propagate = False
+        if path is not None:
+            handler = FileHandler(path)
+            logger.addHandler(handler)
+            logger.setLevel(logging.INFO)
+            logger.propagate = False
     return logger
 
 
@@ -29,7 +32,17 @@ def get_logfile_path():
     have to figure out the path to var/log/ and the instance name ourselves.
     """
     zconf = getConfiguration()
-    handler_factories = zconf.eventlog.handler_factories
+    eventlog = getattr(zconf, 'eventlog', None)
+    if eventlog is None:
+        root_logger.error('')
+        root_logger.error(
+            "ftw.structlog: Couldn't find eventlog configuration in order "
+            "to determine logfile location!")
+        root_logger.error("ftw.structlog: No request logfile will be written!")
+        root_logger.error('')
+        return None
+
+    handler_factories = eventlog.handler_factories
     eventlog_path = handler_factories[0].section.path
     assert eventlog_path.endswith('.log')
     path = eventlog_path.replace('.log', '-json.log')

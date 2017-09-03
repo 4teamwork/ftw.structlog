@@ -5,7 +5,10 @@ Changelog
 1.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fail gracefully if eventlog config can't be found in order to derive
+  log location from it. Instead of preventing instance startup, log a
+  noticeable error message using the root logger.
+  [lgraf]
 
 
 1.0.0 (2017-09-03)
