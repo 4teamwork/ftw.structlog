@@ -86,9 +86,10 @@ will be derived from the instance's eventlog path. If the instance's eventlog
 path is ``var/log/instance2.log``, the JSON logfile's path will be
 ``var/log/instance2-json.log``.
 
-Because ``ftw.structlog`` derives its logfile name from the eventlog path, an
-eventlog *must* be configured in ``zope.conf``, otherwise ``ftw.structlog``
-will prevent the instance from starting.
+**Note**: Because ``ftw.structlog`` derives its logfile name from the
+eventlog path, an eventlog *must* be configured in ``zope.conf``, otherwise
+``ftw.structlog`` will not log any requests and complain noisily through
+the root logger.
 
 Links
 -----
