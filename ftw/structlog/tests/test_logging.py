@@ -1,7 +1,7 @@
 from datetime import timedelta
 from freezegun import freeze_time
-from ftw.jsonlog.testing import PatchedLogTZ
-from ftw.jsonlog.tests import FunctionalTestCase
+from ftw.structlog.testing import PatchedLogTZ
+from ftw.structlog.tests import FunctionalTestCase
 from ftw.testbrowser import browsing
 from operator import itemgetter
 from plone.app.testing import TEST_USER_NAME
@@ -30,7 +30,7 @@ class TestLogging(FunctionalTestCase):
         # Frozen time is specified in UTC
         # tz_offset specifies what offset to UTC the local tz is supposed to
         # have. This is relevant for stdlib functions that return local times,
-        # but *not* for ftw.jsonlog, since we never fetch local times
+        # but *not* for ftw.structlog, since we never fetch local times
         with freeze_time("2017-07-29 10:30:58.000750", tz_offset=7) as clock:
             with PatchedLogTZ('Europe/Zurich'):
                 browser.open(self.portal)
@@ -181,7 +181,7 @@ class TestLogging(FunctionalTestCase):
         # Frozen time is specified in UTC
         # tz_offset specifies what offset to UTC the local tz is supposed to
         # have. This is relevant for stdlib functions that return local times,
-        # but *not* for ftw.jsonlog, since we never fetch local times
+        # but *not* for ftw.structlog, since we never fetch local times
         with freeze_time("2017-07-29 10:30:58.000750", tz_offset=7):
             with PatchedLogTZ('Europe/Zurich'):
                 browser.open(self.portal)
@@ -197,12 +197,12 @@ class TestLogging(FunctionalTestCase):
         # Frozen time is specified in UTC
         # tz_offset specifies what offset to UTC the local tz is supposed to
         # have. This is relevant for stdlib functions that return local times,
-        # but *not* for ftw.jsonlog, since we never fetch local times
+        # but *not* for ftw.structlog, since we never fetch local times
         with freeze_time("2017-07-29 10:30:58.000750", tz_offset=7):
             with PatchedLogTZ('Europe/Athens'):
                 browser.open(self.portal)
 
-        # ftw.jsonlog shouldn consider the system's local TZ for logging.
+        # ftw.structlog shouldn't consider the system's local TZ for logging.
         # The local TZ will be determined by the tzlocal module and set to
         # LOG_TZ, which we patch here to test representation in a "local" TZ
         # which isn't the one on our CI server or dev machines.
