@@ -13,7 +13,7 @@ tests_require = [
 ]
 
 
-setup(name='ftw.jsonlog',
+setup(name='ftw.structlog',
       version=version,
       description="Structured logging for Plone",
       long_description=open("README.rst").read() + "\n" + open(
@@ -32,7 +32,7 @@ setup(name='ftw.jsonlog',
       keywords='structured logging plone',
       author='4teamwork AG',
       author_email='mailto:info@4teamwork.ch',
-      url='https://github.com/4teamwork/ftw.jsonlog',
+      url='https://github.com/4teamwork/ftw.structlog',
       license='GPL2',
 
       packages=find_packages(exclude=['ez_setup']),

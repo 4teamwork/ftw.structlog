@@ -4,7 +4,7 @@ from logging import getLogger
 import logging
 
 
-logger = getLogger('ftw.jsonlog')
+logger = getLogger('ftw.structlog')
 
 
 def setup_logger():

@@ -1,5 +1,5 @@
-from ftw.jsonlog.testing import get_log_path
-from ftw.jsonlog.testing import JSONLOG_FUNCTIONAL_ZSERVER
+from ftw.structlog.testing import get_log_path
+from ftw.structlog.testing import STRUCTLOG_FUNCTIONAL_ZSERVER
 from unittest2 import TestCase
 import json
 import os
@@ -7,7 +7,7 @@ import os
 
 class FunctionalTestCase(TestCase):
 
-    layer = JSONLOG_FUNCTIONAL_ZSERVER
+    layer = STRUCTLOG_FUNCTIONAL_ZSERVER
 
     def setUp(self):
         self.portal = self.layer['portal']

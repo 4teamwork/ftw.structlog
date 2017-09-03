@@ -1,5 +1,5 @@
-ftw.jsonlog
-===========
+ftw.structlog
+=============
 
 This package implements **structured request logging in Plone**.
 
@@ -11,14 +11,14 @@ Z2 log provides, and more, in structured key/value pairs.
 Installation
 ------------
 
-- Install ``ftw.jsonlog`` by adding it to the list of eggs in your buildout.
+- Install ``ftw.structlog`` by adding it to the list of eggs in your buildout.
   Then run buildout and restart your instance:
 
 .. code:: ini
 
     [instance]
     eggs +=
-        ftw.jsonlog
+        ftw.structlog
 
 - Alternatively, add it as a dependency to your package's ``setup.py``.
 
@@ -86,17 +86,17 @@ will be derived from the instance's eventlog path. If the instance's eventlog
 path is ``var/log/instance2.log``, the JSON logfile's path will be
 ``var/log/instance2-json.log``.
 
-Because ``ftw.jsonlog`` derives its logfile name from the eventlog path, an
-eventlog *must* be configured in ``zope.conf``, otherwise ``ftw.jsonlog``
+Because ``ftw.structlog`` derives its logfile name from the eventlog path, an
+eventlog *must* be configured in ``zope.conf``, otherwise ``ftw.structlog``
 will prevent the instance from starting.
 
 Links
 -----
 
-- Github: https://github.com/4teamwork/ftw.jsonlog
-- Issues: https://github.com/4teamwork/ftw.jsonlog/issues
-- Pypi: http://pypi.python.org/pypi/ftw.jsonlog
-- Continuous integration: https://jenkins.4teamwork.ch/search?q=ftw.jsonlog
+- Github: https://github.com/4teamwork/ftw.structlog
+- Issues: https://github.com/4teamwork/ftw.structlog/issues
+- Pypi: http://pypi.python.org/pypi/ftw.structlog
+- Continuous integration: https://jenkins.4teamwork.ch/search?q=ftw.structlog
 
 
 Copyright
@@ -104,4 +104,4 @@ Copyright
 
 This package is copyright by `4teamwork <http://www.4teamwork.ch/>`_.
 
-``ftw.jsonlog`` is licensed under GNU General Public License, version 2.
+``ftw.structlog`` is licensed under GNU General Public License, version 2.

@@ -1,5 +1,5 @@
 from datetime import datetime
-from ftw.jsonlog.logger import setup_logger
+from ftw.structlog.logger import setup_logger
 from threading import local
 from tzlocal import get_localzone
 from zope.component.hooks import getSite
@@ -34,7 +34,7 @@ def handle_pub_end(event):
     try:
         log_request(event)
     except Exception as exc:
-        root_logger.warn('Failed to log request using ftw.jsonlog: %r' % exc)
+        root_logger.warn('Failed to log request using ftw.structlog: %r' % exc)
 
 
 def log_request(event):

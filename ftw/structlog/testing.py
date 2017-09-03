@@ -13,11 +13,11 @@ import ZConfig
 
 
 def get_log_path():
-    """Get filesystem path to ftw.jsonlog's logfile.
+    """Get filesystem path to ftw.structlog's logfile.
     """
-    logger = getLogger('ftw.jsonlog')
-    jsonlog_path = logger.handlers[0].stream.name
-    return jsonlog_path
+    logger = getLogger('ftw.structlog')
+    log_path = logger.handlers[0].stream.name
+    return log_path
 
 
 class PatchedLogTZ(object):
@@ -28,25 +28,25 @@ class PatchedLogTZ(object):
         self.new_tz = pytz.timezone(tzname)
 
     def __enter__(self):
-        from ftw.jsonlog import subscribers
+        from ftw.structlog import subscribers
         self._original_log_tz = subscribers.LOG_TZ
         subscribers.LOG_TZ = self.new_tz
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        from ftw.jsonlog import subscribers
+        from ftw.structlog import subscribers
         subscribers.LOG_TZ = self._original_log_tz
 
 
-class JSONLogLayer(PloneSandboxLayer):
+class StructLogLayer(PloneSandboxLayer):
 
     def setUp(self):
         # Keep track of temporary files we create
         self._created_tempfiles = []
-        super(JSONLogLayer, self).setUp()
+        super(StructLogLayer, self).setUp()
 
     def tearDown(self):
-        super(JSONLogLayer, self).tearDown()
+        super(StructLogLayer, self).tearDown()
 
         # Clean up all temporary files we created
         while self._created_tempfiles:
@@ -60,7 +60,7 @@ class JSONLogLayer(PloneSandboxLayer):
         ftw.contentstats can derive its own logfile path from it.
 
         The filename mimics the instance eventlog's filename though, so that
-        ftw.jsonlog can recognize the filename format and derive a filename
+        ftw.structlog can recognize the filename format and derive a filename
         with its own '-json.log' suffix.
         """
         fd, fn = tempfile.mkstemp(prefix='instance0-', suffix='.log')
@@ -70,7 +70,7 @@ class JSONLogLayer(PloneSandboxLayer):
 
     def setup_eventlog(self):
         """Create an eventlog ZConfig configuration and patch it onto the
-        global config, so it's present when ftw.jsonlog attempts to read it
+        global config, so it's present when ftw.structlog attempts to read it
         to derive its own logfile path from the eventlog's logfile path.
         """
         schema = ZConfig.loadSchemaFile(StringIO("""
@@ -98,7 +98,7 @@ class JSONLogLayer(PloneSandboxLayer):
         del conf.eventlog
 
     def setUpZope(self, app, configurationContext):
-        # Set up the eventlog config before ftw.jsonlog.logger gets imported
+        # Set up the eventlog config before ftw.structlog.logger gets imported
         self.setup_eventlog()
 
         xmlconfig.string(
@@ -107,7 +107,7 @@ class JSONLogLayer(PloneSandboxLayer):
             '  <includePlugins package="plone" />'
             '  <includePluginsOverrides package="plone" />'
             '  <include package="plone.rest" />'
-            '  <include package="ftw.jsonlog.demo" />'
+            '  <include package="ftw.structlog.demo" />'
             '</configure>',
             context=configurationContext)
 
@@ -115,14 +115,14 @@ class JSONLogLayer(PloneSandboxLayer):
         self.remove_eventlog()
 
     def testTearDown(self):
-        # Isolation: truncate ftw.jsonlog's logfile after each test
+        # Isolation: truncate ftw.structlog's logfile after each test
         with open(get_log_path(), 'w') as f:
             f.truncate()
 
 
-JSONLOG_FIXTURE = JSONLogLayer()
-JSONLOG_FUNCTIONAL_ZSERVER = FunctionalTesting(
+STRUCTLOG_FIXTURE = StructLogLayer()
+STRUCTLOG_FUNCTIONAL_ZSERVER = FunctionalTesting(
     bases=(z2.ZSERVER_FIXTURE,
            REQUESTS_BROWSER_FIXTURE,
-           JSONLOG_FIXTURE),
-    name="ftw.jsonlog:functional:zserver")
+           STRUCTLOG_FIXTURE),
+    name="ftw.structlog:functional:zserver")
