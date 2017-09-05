@@ -1,3 +1,4 @@
+from urlparse import urlparse
 from zope.component.hooks import getSite
 import time
 
@@ -14,13 +15,21 @@ def collect_data_to_log(timing, request):
     duration = time.time() - timing.pub_start
     timing.pub_start = None
 
+    full_url = get_url(request)
+    parsed_url = urlparse(full_url)
+
     request_data = {
         'host': request.getClientAddr(),
         'site': get_site_id(),
         'user': get_username(request),
         'timestamp': timing.timestamp,
         'method': request.method,
-        'url': get_url(request),
+        'url': full_url,
+        'scheme': parsed_url.scheme,
+        'hostname': parsed_url.hostname,
+        'path': parsed_url.path,
+        'query': parsed_url.query,
+        'port': parsed_url.port,
         'status': request.response.getStatus(),
         'bytes': get_content_length(request),
         'duration': duration,

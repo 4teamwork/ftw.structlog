@@ -5,6 +5,9 @@ Changelog
 1.0.2 (unreleased)
 ------------------
 
+- Log different URL components separately as structured data.
+  [lgraf]
+
 - Always log missing referer as empty string instead of ``null``.
   [lgraf]
 

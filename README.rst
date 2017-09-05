@@ -34,12 +34,17 @@ Example entry:
       "bytes": 6875,
       "duration": 0.30268411636353,
       "host": "127.0.0.1",
+      "hostname": "plone.example.org",
       "method": "GET",
+      "path": "\/plone\/my-page",
+      "port": 8080,
+      "query": "key=value",
       "referer": "http:\/\/localhost:8080\/plone",
+      "scheme": "http",
       "site": "plone",
       "status": 200,
       "timestamp": "2017-07-29T12:30:58.000750+02:00",
-      "url": "http:\/\/localhost:8080\/plone\/my-page",
+      "url": "http:\/\/localhost:8080\/plone\/my-page?key=value",
       "user": "john.doe",
       "user_agent": "Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/60.0.3112.113 Safari\/537.36"
     }

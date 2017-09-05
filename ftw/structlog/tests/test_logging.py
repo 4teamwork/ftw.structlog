@@ -19,10 +19,24 @@ class TestLogging(FunctionalTestCase):
 
         log_entry = self.get_log_entries()[-1]
 
-        self.assertItemsEqual(
-            [u'status', u'url', u'timestamp', u'bytes', u'host', u'site',
-             u'referer', u'user', u'duration', u'method', u'user_agent'],
-            log_entry.keys())
+        self.assertItemsEqual([
+            u'bytes',
+            u'duration',
+            u'host',
+            u'hostname',
+            u'method',
+            u'path',
+            u'port',
+            u'query',
+            u'referer',
+            u'scheme',
+            u'site',
+            u'status',
+            u'timestamp',
+            u'url',
+            u'user',
+            u'user_agent',
+        ], log_entry.keys())
 
     @browsing
     def test_logs_multiple_requests(self, browser):
@@ -100,7 +114,7 @@ class TestLogging(FunctionalTestCase):
         self.assertEquals(u'HEAD', log_entry['method'])
 
     @browsing
-    def test_logs_url(self, browser):
+    def test_logs_full_url(self, browser):
         browser.login()
 
         browser.open(view='@@ping')
@@ -110,7 +124,7 @@ class TestLogging(FunctionalTestCase):
             log_entry['url'])
 
     @browsing
-    def test_logs_url_with_query_string(self, browser):
+    def test_logs_full_url_with_query_string(self, browser):
         browser.login()
 
         browser.open(view='@@ping?foo=bar')
@@ -118,6 +132,59 @@ class TestLogging(FunctionalTestCase):
         self.assertEquals(
             u'http://localhost:%s/plone/@@ping?foo=bar' % self.zserver_port,
             log_entry['url'])
+
+    @browsing
+    def test_logs_url_path_component(self, browser):
+        browser.login()
+        browser.open(self.portal, view='@@ping')
+
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(
+            u'/plone/@@ping',
+            log_entry['path'])
+
+    @browsing
+    def test_logs_url_querystring(self, browser):
+        browser.login()
+        browser.open(self.portal, view='@@ping?key=value')
+
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(
+            u'key=value',
+            log_entry['query'])
+
+    @browsing
+    def test_logs_url_scheme(self, browser):
+        browser.login()
+        browser.open(self.portal)
+
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(
+            u'http',
+            log_entry['scheme'])
+
+    @browsing
+    def test_logs_hostname(self, browser):
+        browser.login()
+
+        session = browser.get_driver().requests_session
+        session.get('http://127.0.0.1:%s/plone' % self.zserver_port,
+                    headers={'Host': 'foo.example.org'})
+
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(
+            u'foo.example.org',
+            log_entry['hostname'])
+
+    @browsing
+    def test_logs_port(self, browser):
+        browser.login()
+        browser.open(self.portal)
+
+        log_entry = self.get_log_entries()[-1]
+        self.assertEquals(
+            int(self.zserver_port),
+            log_entry['port'])
 
     @browsing
     def test_logs_reponse_status(self, browser):
