@@ -24,8 +24,7 @@ def collect_data_to_log(timing, request):
         'status': request.response.getStatus(),
         'bytes': get_content_length(request),
         'duration': duration,
-        # TODO: Always return empty string if no referrer
-        'referer': request.environ.get('HTTP_REFERER'),
+        'referer': request.environ.get('HTTP_REFERER', ''),
         'user_agent': request.environ.get('HTTP_USER_AGENT'),
     }
     return request_data
