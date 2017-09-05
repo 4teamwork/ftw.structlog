@@ -151,7 +151,7 @@ class TestLogging(FunctionalTestCase):
         # First request, no referer
         browser.open(self.portal)
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(None, log_entry['referer'])
+        self.assertEquals(u'', log_entry['referer'])
 
         # Send referer with second request
         browser.open(view='@@ping', referer=True)
