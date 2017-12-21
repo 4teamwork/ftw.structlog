@@ -5,6 +5,9 @@ Changelog
 1.0.2 (unreleased)
 ------------------
 
+- Add Plone 5 compatibility.
+  [phgross]
+
 - Always log missing referer as empty string instead of ``null``.
   [lgraf]
 
