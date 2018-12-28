@@ -2,8 +2,12 @@ Changelog
 =========
 
 
-1.0.2 (unreleased)
+1.1.0 (unreleased)
 ------------------
+
+- DEPRECATED: The ``host`` field is deprecated. Instead, the newly introduced
+  ``client_ip`` field should be used to get the client's IP address.
+  [lgraf]
 
 - Always log missing referer as empty string instead of ``null``.
   [lgraf]

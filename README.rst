@@ -32,6 +32,7 @@ Example entry:
 
     {
       "bytes": 6875,
+      "cient_ip": "127.0.0.1",
       "duration": 0.30268411636353,
       "host": "127.0.0.1",
       "method": "GET",
@@ -52,11 +53,13 @@ The logged JSON entry contains the following data:
 +============+===============================================================+
 | bytes      | Size of response body in bytes (``Content-Length``)           |
 +------------+---------------------------------------------------------------+
+| client_ip  | Host where the request originated from (respecting            |
+|            | X-Forwarded-For)                                              |
++------------+---------------------------------------------------------------+
 | duration   | Time spent in ZPublisher to handle request (time between      |
 |            | ``IPubStart`` and ``IPubSuccess`` / ``IPubFailure`` )         |
 +------------+---------------------------------------------------------------+
-| host       | Host where the request originated from (respecting            |
-|            | X-Forwarded-For)                                              |
+| host       | Deprecated. You should use ``client_ip`` instead.             |
 +------------+---------------------------------------------------------------+
 | method     | HTTP request method                                           |
 +------------+---------------------------------------------------------------+

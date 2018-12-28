@@ -20,7 +20,7 @@ class TestLogging(FunctionalTestCase):
         log_entry = self.get_log_entries()[-1]
 
         self.assertItemsEqual(
-            [u'status', u'url', u'timestamp', u'bytes', u'host', u'site',
+            [u'status', u'url', u'timestamp', u'bytes', u'host', u'site', u'client_ip',
              u'referer', u'user', u'duration', u'method', u'user_agent'],
             log_entry.keys())
 
@@ -279,7 +279,7 @@ class TestLogging(FunctionalTestCase):
         # Standard source address
         browser.open(self.portal)
         log_entry = self.get_log_entries()[-1]
-        self.assertEqual('127.0.0.1', log_entry['host'])
+        self.assertEqual('127.0.0.1', log_entry['client_ip'])
 
     # Mac OS rejects source addresses other than 127.0.0.1 from the loopback
     # interface with "[Errno 49] Can't assign requested address"
@@ -291,4 +291,4 @@ class TestLogging(FunctionalTestCase):
 
         browser.open('http://localhost:%s/plone' % self.zserver_port)
         log_entry = self.get_log_entries()[-1]
-        self.assertEqual('127.0.0.42', log_entry['host'])
+        self.assertEqual('127.0.0.42', log_entry['client_ip'])
