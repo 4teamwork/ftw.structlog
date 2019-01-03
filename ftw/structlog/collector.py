@@ -15,7 +15,8 @@ def collect_data_to_log(timing, request):
     timing.pub_start = None
 
     request_data = {
-        'host': request.getClientAddr(),
+        'host': request.getClientAddr(),  # deprecated, client_ip should be used instead
+        'client_ip': request.getClientAddr(),
         'site': get_site_id(),
         'user': get_username(request),
         'timestamp': timing.timestamp,
