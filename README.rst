@@ -94,6 +94,9 @@ eventlog path, an eventlog *must* be configured in ``zope.conf``, otherwise
 ``ftw.structlog`` will not log any requests and complain noisily through
 the root logger.
 
+When running tests in other projects, these errors can be muted by setting the
+environment variable ``FTW_STRUCTLOG_MUTE_SETUP_ERRORS=true``.
+
 Links
 -----
 
