@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.1.0 (unreleased)
+1.1.0 (2019-01-11)
 ------------------
 
 - DEPRECATED: The ``host`` field is deprecated. Instead, the newly introduced
