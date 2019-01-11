@@ -3,6 +3,7 @@ from logging import FileHandler
 from logging import getLogger
 import json
 import logging
+import os
 
 
 logger = getLogger('ftw.structlog')
@@ -34,12 +35,13 @@ def get_logfile_path():
     zconf = getConfiguration()
     eventlog = getattr(zconf, 'eventlog', None)
     if eventlog is None:
-        root_logger.error('')
-        root_logger.error(
-            "ftw.structlog: Couldn't find eventlog configuration in order "
-            "to determine logfile location!")
-        root_logger.error("ftw.structlog: No request logfile will be written!")
-        root_logger.error('')
+        if os.environ.get('FTW_STRUCTLOG_MUTE_SETUP_ERRORS', '').lower().strip() != 'true':
+            root_logger.error('')
+            root_logger.error(
+                "ftw.structlog: Couldn't find eventlog configuration in order "
+                "to determine logfile location!")
+            root_logger.error("ftw.structlog: No request logfile will be written!")
+            root_logger.error('')
         return None
 
     handler_factories = eventlog.handler_factories
