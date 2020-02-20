@@ -9,7 +9,7 @@ tests_require = [
     'ftw.testbrowser',
     'requests_toolbelt',
     'plone.rest',
-    'freezegun',
+    'freezegun < 0.3.15',
 ]
 
 
