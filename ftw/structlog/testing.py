@@ -3,6 +3,8 @@ from ftw.testbrowser import REQUESTS_BROWSER_FIXTURE
 from logging import getLogger
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
 from plone.testing import z2
 from StringIO import StringIO
 from zope.configuration import xmlconfig
@@ -111,6 +113,9 @@ class StructLogLayer(PloneSandboxLayer):
             '  <include package="ftw.structlog.demo" />'
             '</configure>',
             context=configurationContext)
+
+    def setUpPloneSite(self, portal):
+        setRoles(portal, TEST_USER_ID, ['Manager'])
 
     def tearDownZope(self, app):
         self.remove_eventlog()
