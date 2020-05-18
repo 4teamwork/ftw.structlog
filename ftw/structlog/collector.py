@@ -1,3 +1,4 @@
+from zope.annotation import IAnnotations
 from zope.component.hooks import getSite
 import time
 
@@ -28,6 +29,11 @@ def collect_data_to_log(timing, request):
         'referer': request.environ.get('HTTP_REFERER', ''),
         'user_agent': request.environ.get('HTTP_USER_AGENT'),
     }
+
+    sql_query_time = IAnnotations(request).get('sql_query_time')
+    if sql_query_time:
+        request_data['sql_query_time'] = sql_query_time
+
     return request_data
 
 
