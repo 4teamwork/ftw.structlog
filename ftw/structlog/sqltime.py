@@ -23,8 +23,10 @@ def after_cursor_execute(conn, cursor, statement,
 
     # Track cumulative query execution time in request annotations,
     # for it to be collected later when logging the request.
-    ann = IAnnotations(getRequest())
-    ann['sql_query_time'] = ann.get('sql_query_time', 0) + query_time
+    request = getRequest()
+    if request:
+        ann = IAnnotations(request)
+        ann['sql_query_time'] = ann.get('sql_query_time', 0) + query_time
 
 
 def register_query_profiling_listeners(event):
