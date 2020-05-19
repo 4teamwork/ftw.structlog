@@ -42,7 +42,8 @@ Example entry:
       "timestamp": "2017-07-29T12:30:58.000750+02:00",
       "url": "http:\/\/localhost:8080\/plone\/my-page",
       "user": "john.doe",
-      "user_agent": "Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/60.0.3112.113 Safari\/537.36"
+      "user_agent": "Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/60.0.3112.113 Safari\/537.36",
+      "view": "some_view"
     }
 
 
@@ -79,6 +80,8 @@ The logged JSON entry contains the following data:
 +------------+---------------------------------------------------------------+
 | user_agent | User-Agent                                                    |
 +------------+---------------------------------------------------------------+
+| view       | Name of the browser view or REST API endpoint  (see below)    |
++------------+---------------------------------------------------------------+
 
 
 If ``SQLAlchemy`` is installed and integrated via ``z3c.saconfig``, SQL query
@@ -108,6 +111,44 @@ the root logger.
 
 When running tests in other projects, these errors can be muted by setting the
 environment variable ``FTW_STRUCTLOG_MUTE_SETUP_ERRORS=true``.
+
+View Name
+---------
+
+An attempt is made to log the name of the invoked browser view or REST API
+endpoint, so that requests to particular views can easily be grouped without
+having to resort to URL string parsing.
+
+However, this is intentionally limited, and aims to only handle the most
+common and useful cases. It's also implemented in a way to not fill up logs
+with too many diverse values for ``view``, by grouping together very
+common requests (CSS and JS assets) under common names.
+
+The following table gives an example of how names of different "views" are
+logged:
+
++-------------------------------------------------+----------------------+
+| View Type                                       | view                 |
++=================================================+======================+
+| Regular browser view                            | 'some_view'          |
++-------------------------------------------------+----------------------+
+| Regular browser view, published attributes      | 'some_view/attr'     |
++-------------------------------------------------+----------------------+
+| plone.rest named services                       | '@actions'           |
++-------------------------------------------------+----------------------+
+| plone.rest named services with path params      | '@users'             |
++-------------------------------------------------+----------------------+
+| plone.rest unnamed GET/POST/...                 | 'context'            |
++-------------------------------------------------+----------------------+
+| CSS                                             | 'portal_css'         |
++-------------------------------------------------+----------------------+
+| JS                                              | 'portal_javascripts' |
++-------------------------------------------------+----------------------+
+| Resources                                       | '++resource++'        |
++-------------------------------------------------+----------------------+
+| Theme resources                                 | '++theme++'           |
++-------------------------------------------------+----------------------+
+
 
 Links
 -----

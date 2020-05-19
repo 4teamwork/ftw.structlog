@@ -3,6 +3,7 @@ from freezegun import freeze_time
 from ftw.structlog.testing import PatchedLogTZ
 from ftw.structlog.tests import FunctionalTestCase
 from ftw.testbrowser import browsing
+from ftw.testbrowser.pages import factoriesmenu
 from operator import itemgetter
 from plone.app.testing import TEST_USER_NAME
 from requests_toolbelt.adapters.source import SourceAddressAdapter
@@ -29,7 +30,7 @@ class TestLogging(FunctionalTestCase):
 
         self.assertItemsEqual(
             [u'status', u'url', u'timestamp', u'bytes', u'host', u'site', u'client_ip',
-             u'referer', u'user', u'duration', u'method', u'user_agent'],
+             u'referer', u'user', u'duration', u'method', u'user_agent', u'view'],
             log_entry.keys())
 
     @browsing
@@ -47,8 +48,8 @@ class TestLogging(FunctionalTestCase):
 
         log_entries = self.get_log_entries()
 
-        self.assertEquals(2, len(log_entries))
-        self.assertEquals(
+        self.assertEqual(2, len(log_entries))
+        self.assertEqual(
             [u'2017-07-29T12:30:58.000750+02:00',
              u'2017-07-29T12:35:58.000750+02:00'],
             map(itemgetter('timestamp'), log_entries))
@@ -58,7 +59,7 @@ class TestLogging(FunctionalTestCase):
         browser.open(self.portal)
 
         log_entry = self.get_log_entries()[0]
-        self.assertEquals(u'plone', log_entry['site'])
+        self.assertEqual(u'plone', log_entry['site'])
 
     @browsing
     def test_logs_username_for_authenticated_user(self, browser):
@@ -66,14 +67,14 @@ class TestLogging(FunctionalTestCase):
         browser.open(self.portal)
 
         log_entry = self.get_log_entries()[0]
-        self.assertEquals(TEST_USER_NAME, log_entry['user'])
+        self.assertEqual(TEST_USER_NAME, log_entry['user'])
 
     @browsing
     def test_logs_username_for_anonymous(self, browser):
         browser.open(self.portal)
 
         log_entry = self.get_log_entries()[0]
-        self.assertEquals(u'Anonymous User', log_entry['user'])
+        self.assertEqual(u'Anonymous User', log_entry['user'])
 
     @browsing
     def test_logs_request_methods(self, browser):
@@ -81,31 +82,31 @@ class TestLogging(FunctionalTestCase):
 
         browser.open(view='@@ping')
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(u'GET', log_entry['method'])
+        self.assertEqual(u'GET', log_entry['method'])
 
         browser.open(view='@@ping', method='POST')
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(u'POST', log_entry['method'])
+        self.assertEqual(u'POST', log_entry['method'])
 
         browser.open(view='@rest-endpoint', method='PUT',
                      headers={'Accept': 'application/json'})
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(u'PUT', log_entry['method'])
+        self.assertEqual(u'PUT', log_entry['method'])
 
         browser.open(view='@rest-endpoint', method='PATCH',
                      headers={'Accept': 'application/json'})
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(u'PATCH', log_entry['method'])
+        self.assertEqual(u'PATCH', log_entry['method'])
 
         browser.open(view='@rest-endpoint', method='DELETE',
                      headers={'Accept': 'application/json'})
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(u'DELETE', log_entry['method'])
+        self.assertEqual(u'DELETE', log_entry['method'])
 
         browser.open(view='@rest-endpoint', method='HEAD',
                      headers={'Accept': 'application/json'})
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(u'HEAD', log_entry['method'])
+        self.assertEqual(u'HEAD', log_entry['method'])
 
     @browsing
     def test_logs_url(self, browser):
@@ -113,7 +114,7 @@ class TestLogging(FunctionalTestCase):
 
         browser.open(view='@@ping')
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(
+        self.assertEqual(
             u'http://localhost:%s/plone/@@ping' % self.zserver_port,
             log_entry['url'])
 
@@ -123,7 +124,7 @@ class TestLogging(FunctionalTestCase):
 
         browser.open(view='@@ping?foo=bar')
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(
+        self.assertEqual(
             u'http://localhost:%s/plone/@@ping?foo=bar' % self.zserver_port,
             log_entry['url'])
 
@@ -134,23 +135,23 @@ class TestLogging(FunctionalTestCase):
 
         browser.open(view='@@ping')
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(200, log_entry['status'])
+        self.assertEqual(200, log_entry['status'])
 
         browser.open(view='@@internal-server-error')
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(500, log_entry['status'])
+        self.assertEqual(500, log_entry['status'])
 
         browser.open(view='@@unauthorized')
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(401, log_entry['status'])
+        self.assertEqual(401, log_entry['status'])
 
         browser.open(view='@@redirect')
         log_entry = self.get_log_entries()[-2]
-        self.assertEquals(302, log_entry['status'])
+        self.assertEqual(302, log_entry['status'])
 
         browser.open(view='@@doesnt-exist')
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(404, log_entry['status'])
+        self.assertEqual(404, log_entry['status'])
 
     @browsing
     def test_logs_referer(self, browser):
@@ -159,12 +160,12 @@ class TestLogging(FunctionalTestCase):
         # First request, no referer
         browser.open(self.portal)
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(u'', log_entry['referer'])
+        self.assertEqual(u'', log_entry['referer'])
 
         # Send referer with second request
         browser.open(view='@@ping', referer=True)
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(
+        self.assertEqual(
             u'http://localhost:%s/plone' % self.zserver_port,
             log_entry['referer'])
 
@@ -180,7 +181,7 @@ class TestLogging(FunctionalTestCase):
         # Custom user agent
         browser.open(self.portal, headers={'User-Agent': 'foobar/3.1415'})
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals('foobar/3.1415', log_entry['user_agent'])
+        self.assertEqual('foobar/3.1415', log_entry['user_agent'])
 
     @browsing
     def test_logs_timestamp(self, browser):
@@ -278,7 +279,7 @@ class TestLogging(FunctionalTestCase):
         browser.open(self.portal, view='send-100-bytes')
 
         log_entry = self.get_log_entries()[-1]
-        self.assertEquals(100, log_entry['bytes'])
+        self.assertEqual(100, log_entry['bytes'])
 
     @browsing
     def test_logs_standard_source_address(self, browser):
@@ -288,6 +289,131 @@ class TestLogging(FunctionalTestCase):
         browser.open(self.portal)
         log_entry = self.get_log_entries()[-1]
         self.assertEqual('127.0.0.1', log_entry['client_ip'])
+
+    @browsing
+    def test_logs_view_in_management_views(self, browser):
+        browser.login()
+
+        browser.open(self.portal, view='manage_main')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'manage_main', log_entry['view'])
+
+        browser.open(self.portal, view='/portal_catalog/manage_catalogIndexes')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'manage_catalogIndexes', log_entry['view'])
+
+        browser.open(self.portal, view='edit')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'site-controlpanel', log_entry['view'])
+
+    @browsing
+    def test_logs_view_when_calling_add_view(self, browser):
+        browser.login()
+
+        browser.open(self.portal)
+        factoriesmenu.add('Folder')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'portal_factory', log_entry['view'])
+
+        browser.fill({'Title': 'foo'}).submit()
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'folder_listing', log_entry['view'])
+
+        browser.click_on('Edit')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'atct_edit', log_entry['view'])
+
+        browser.fill({'Title': 'bar'}).submit()
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'folder_listing', log_entry['view'])
+
+        browser.click_on('Sharing')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'sharing', log_entry['view'])
+
+        browser.click_on('Contents')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'folder_contents', log_entry['view'])
+
+    @browsing
+    def test_logs_view_when_calling_browser_views(self, browser):
+        browser.login()
+
+        browser.open(view='@@ping')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'ping', log_entry['view'])
+
+        browser.open(view='ping')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'ping', log_entry['view'])
+
+    @browsing
+    def test_logs_view_when_calling_published_attributes(self, browser):
+        browser.login()
+
+        browser.open(view='ping/some_method')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'ping/some_method', log_entry['view'])
+
+    @browsing
+    def test_logs_view_when_calling_rest_endpoints(self, browser):
+        browser.login()
+
+        browser.open(view='@rest-endpoint', method='PUT',
+                     headers={'Accept': 'application/json'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'@rest-endpoint',
+                          log_entry['view'])
+
+        browser.open(view='@rest-endpoint', method='PATCH',
+                     headers={'Accept': 'application/json'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'@rest-endpoint',
+                          log_entry['view'])
+
+        browser.open(view='@rest-endpoint', method='DELETE',
+                     headers={'Accept': 'application/json'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'@rest-endpoint',
+                          log_entry['view'])
+
+        browser.open(view='@rest-endpoint', method='HEAD',
+                     headers={'Accept': 'application/json'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'@rest-endpoint',
+                          log_entry['view'])
+
+    @browsing
+    def test_logs_view_for_unnamed_rest_endpoint(self, browser):
+        browser.login()
+
+        browser.open(self.portal, method='GET',
+                     headers={'Accept': 'application/json'})
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'context',
+                          log_entry['view'])
+
+    @browsing
+    def test_logs_view_for_asset_requests(self, browser):
+        browser.login()
+
+        browser.raise_http_errors = False
+
+        browser.open(self.portal.absolute_url() + '/portal_css/some.css')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'portal_css', log_entry['view'])
+
+        browser.open(self.portal.absolute_url() + '/portal_javascripts/some.js')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'portal_javascripts', log_entry['view'])
+
+        browser.open(self.portal.absolute_url() + '/++resource++/some.js')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'++resource++', log_entry['view'])
+
+        browser.open(self.portal.absolute_url() + '/++theme++/some.css')
+        log_entry = self.get_log_entries()[-1]
+        self.assertEqual(u'++theme++', log_entry['view'])
 
     # Mac OS rejects source addresses other than 127.0.0.1 from the loopback
     # interface with "[Errno 49] Can't assign requested address"

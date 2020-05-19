@@ -11,6 +11,7 @@
         name="ping"
         class=".views.Ping"
         permission="zope.Public"
+        allowed_attributes="some_method"
         />
 
     <browser:page
@@ -40,6 +41,14 @@
         class=".views.SendHundredBytes"
         permission="zope.Public"
         />
+
+    <plone:service
+        method="GET"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        factory=".views.RESTEndpoint"
+        accept='application/json'
+        permission="zope.Public"
+      />
 
     <plone:service
         method="PUT"

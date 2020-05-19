@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.2.1.dev0'
+version = '1.3.0.dev0'
 
 tests_require = [
     'unittest2',
@@ -9,6 +9,7 @@ tests_require = [
     'ftw.testbrowser',
     'requests_toolbelt',
     'plone.rest',
+    'Plone',
     'freezegun < 0.3.15',
 ]
 

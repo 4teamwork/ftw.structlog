@@ -8,6 +8,10 @@ class Ping(BrowserView):
     def __call__(self):
         return 'pong'
 
+    def some_method(self):
+        """Docstring to allow publishing"""
+        return 'pong from method'
+
 
 class InternalServerError(BrowserView):
 
