@@ -16,8 +16,9 @@ def get_log_path():
     """Get filesystem path to ftw.structlog's logfile.
     """
     logger = getLogger('ftw.structlog')
-    log_path = logger.handlers[0].stream.name
-    return log_path
+    if logger.handlers:
+        log_path = logger.handlers[0].stream.name
+        return log_path
 
 
 class PatchedLogTZ(object):
@@ -116,8 +117,10 @@ class StructLogLayer(PloneSandboxLayer):
 
     def testTearDown(self):
         # Isolation: truncate ftw.structlog's logfile after each test
-        with open(get_log_path(), 'w') as f:
-            f.truncate()
+        log_path = get_log_path()
+        if log_path and os.path.isfile(log_path):
+            with open(log_path, 'w') as f:
+                f.truncate()
 
 
 STRUCTLOG_FIXTURE = StructLogLayer()

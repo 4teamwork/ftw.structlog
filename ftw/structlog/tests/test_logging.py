@@ -6,8 +6,16 @@ from ftw.testbrowser import browsing
 from operator import itemgetter
 from plone.app.testing import TEST_USER_NAME
 from requests_toolbelt.adapters.source import SourceAddressAdapter
+import pkg_resources
 import sys
 import unittest
+
+
+try:
+    pkg_resources.get_distribution('z3c.saconfig')
+    HAS_SQLALCHEMY = True
+except pkg_resources.DistributionNotFound:
+    HAS_SQLALCHEMY = False
 
 
 class TestLogging(FunctionalTestCase):
@@ -292,3 +300,12 @@ class TestLogging(FunctionalTestCase):
         browser.open('http://localhost:%s/plone' % self.zserver_port)
         log_entry = self.get_log_entries()[-1]
         self.assertEqual('127.0.0.42', log_entry['client_ip'])
+
+    @unittest.skipUnless(HAS_SQLALCHEMY, "Test requires SQLAlchemy")
+    @browsing
+    def test_logs_sql_query_time(self, browser):
+        browser.login()
+        browser.open(self.portal, view='run-sql-query')
+
+        log_entry = self.get_log_entries()[-1]
+        self.assertIsInstance(log_entry['sql_query_time'], float)

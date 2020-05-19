@@ -1,5 +1,6 @@
 <configure
-    xmlns="http://namespaces.zope.org/zope">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml">
 
   <subscriber
       for="ZPublisher.interfaces.IPubStart"
@@ -15,5 +16,12 @@
       for="ZPublisher.interfaces.IPubFailure"
       handler=".subscribers.handle_pub_end"
       />
+
+    <configure zcml:condition="installed z3c.saconfig">
+      <subscriber
+          for="z3c.saconfig.interfaces.IEngineCreatedEvent"
+          handler=".sqltime.register_query_profiling_listeners"
+          />
+    </configure>
 
 </configure>

@@ -81,6 +81,18 @@ The logged JSON entry contains the following data:
 +------------+---------------------------------------------------------------+
 
 
+If ``SQLAlchemy`` is installed and integrated via ``z3c.saconfig``, SQL query
+times will also be logged. For requests that perform SQL queries, there will
+be an additional key ``sql_query_time`` containing the cumulative time of
+all SQL queries during that request:
+
++----------------+----------------------------------------------------------------+
+| key            | value                                                          |
++================+================================================================+
+| sql_query_time | Cumulative time of all SQL queries during request (in seconds) |
++----------------+----------------------------------------------------------------+
+
+
 Logfile Location
 ----------------
 
