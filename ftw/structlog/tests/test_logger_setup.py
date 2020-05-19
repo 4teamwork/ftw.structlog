@@ -39,7 +39,7 @@ class TestSetupLogger(TestCase):
         with self.captured_log() as output:
             yield
 
-        self.assertEquals(expected.strip(), output.getvalue().strip())
+        self.assertEqual(expected.strip(), output.getvalue().strip())
 
     @contextmanager
     def captured_log(self):
