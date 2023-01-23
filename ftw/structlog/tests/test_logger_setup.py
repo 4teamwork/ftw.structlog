@@ -1,9 +1,12 @@
 from contextlib import contextmanager
+from fluent.asynchandler import FluentHandler
 from ftw.structlog.logger import setup_logger
+from ftw.structlog.testing import env_var
+from logging import FileHandler
+from mock import patch
 from StringIO import StringIO
 from unittest2 import TestCase
 import logging
-import os
 
 
 class TestSetupLogger(TestCase):
@@ -31,8 +34,35 @@ class TestSetupLogger(TestCase):
             setup_logger()
 
         with self.expect_log_output(''):
-            with self.env_variable_set('FTW_STRUCTLOG_MUTE_SETUP_ERRORS', 'true'):
+            with env_var('FTW_STRUCTLOG_MUTE_SETUP_ERRORS', 'true'):
                 setup_logger()
+
+    @patch('ftw.structlog.logger.get_logfile_path')
+    def test_sets_up_file_handler_by_default(self, mocked_logpath):
+        mocked_logpath.return_value = '/tmp/logfile'
+        logger = setup_logger()
+
+        self.assertEqual(1, len(logger.handlers))
+        handler = logger.handlers[0]
+        self.assertIsInstance(handler, FileHandler)
+        self.assertEqual('/tmp/logfile', handler.stream.name)
+
+    @patch('ftw.structlog.logger.get_logfile_path')
+    def test_sets_up_fluent_handler_if_envvar_set(self, mocked_logpath):
+        # Mock the presence of a possible log file path in order to test that
+        # even if one could be determined, setup_logger() *doesn't* set up
+        # a FileHandler if FLUENT_HOST is set.
+        mocked_logpath.return_value = '/tmp/logfile'
+
+        logger = logging.getLogger('ftw.structlog')
+        map(logger.removeHandler, logger.handlers)
+
+        with env_var('FLUENT_HOST', 'localhost'):
+            logger = setup_logger()
+
+        self.assertEqual(1, len(logger.handlers))
+        handler = logger.handlers[0]
+        self.assertIsInstance(handler, FluentHandler)
 
     @contextmanager
     def expect_log_output(self, expected):
@@ -50,13 +80,3 @@ class TestSetupLogger(TestCase):
             yield output
         finally:
             logging.root.removeHandler(handler)
-
-    @contextmanager
-    def env_variable_set(self, name, value):
-        assert name not in os.environ, \
-            'Unexpectedly found the variable {} in the environment.'.format(name)
-        os.environ[name] = value
-        try:
-            yield
-        finally:
-            os.environ.pop(name)
