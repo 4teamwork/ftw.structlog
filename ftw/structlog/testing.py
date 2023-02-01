@@ -1,4 +1,6 @@
 from App.config import getConfiguration
+from contextlib import contextmanager
+from ftw.structlog.logger import setup_logger
 from ftw.testbrowser import REQUESTS_BROWSER_FIXTURE
 from logging import getLogger
 from plone.app.testing import FunctionalTesting
@@ -8,6 +10,7 @@ from plone.app.testing import TEST_USER_ID
 from plone.testing import z2
 from StringIO import StringIO
 from zope.configuration import xmlconfig
+import logging
 import os
 import pytz
 import tempfile
@@ -21,6 +24,17 @@ def get_log_path():
     if logger.handlers:
         log_path = logger.handlers[0].stream.name
         return log_path
+
+
+@contextmanager
+def env_var(name, value):
+    assert name not in os.environ, \
+        'Unexpectedly found the variable {} in the environment.'.format(name)
+    os.environ[name] = value
+    try:
+        yield
+    finally:
+        os.environ.pop(name)
 
 
 class PatchedLogTZ(object):
@@ -54,6 +68,10 @@ class StructLogLayer(PloneSandboxLayer):
         # Clean up all temporary files we created
         while self._created_tempfiles:
             os.unlink(self._created_tempfiles.pop())
+
+        # Remove any log handlers that were set up
+        logger = logging.getLogger('ftw.structlog')
+        map(logger.removeHandler, logger.handlers)
 
     def mktemp(self):
         """Create a temporary file to use as the path for the eventlog.
@@ -128,9 +146,47 @@ class StructLogLayer(PloneSandboxLayer):
                 f.truncate()
 
 
+class StructLogFluentLayer(PloneSandboxLayer):
+
+    def setUpZope(self, app, configurationContext):
+        xmlconfig.string(
+            '<configure xmlns="http://namespaces.zope.org/zope">'
+            '  <include package="z3c.autoinclude" file="meta.zcml" />'
+            '  <includePlugins package="plone" />'
+            '  <includePluginsOverrides package="plone" />'
+            '  <include package="plone.rest" />'
+            '  <include package="ftw.structlog.demo" />'
+            '</configure>',
+            context=configurationContext)
+
+    def setUpPloneSite(self, portal):
+        setRoles(portal, TEST_USER_ID, ['Manager'])
+
+    def setUp(self):
+        os.environ['FLUENT_HOST'] = 'localhost'
+        setup_logger()
+        super(StructLogFluentLayer, self).setUp()
+
+    def tearDown(self):
+        os.environ.pop('FLUENT_HOST', None)
+
+        # Remove any log handlers that were set up
+        logger = logging.getLogger('ftw.structlog')
+        map(logger.removeHandler, logger.handlers)
+        super(StructLogFluentLayer, self).tearDown()
+
+
 STRUCTLOG_FIXTURE = StructLogLayer()
 STRUCTLOG_FUNCTIONAL_ZSERVER = FunctionalTesting(
     bases=(z2.ZSERVER_FIXTURE,
            REQUESTS_BROWSER_FIXTURE,
            STRUCTLOG_FIXTURE),
     name="ftw.structlog:functional:zserver")
+
+
+STRUCTLOG_FLUENT_FIXTURE = StructLogFluentLayer()
+STRUCTLOG_FUNCTIONAL_FLUENT = FunctionalTesting(
+    bases=(z2.ZSERVER_FIXTURE,
+           REQUESTS_BROWSER_FIXTURE,
+           STRUCTLOG_FLUENT_FIXTURE),
+    name="ftw.structlog:functional:fluent")

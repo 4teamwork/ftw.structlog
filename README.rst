@@ -96,8 +96,18 @@ all SQL queries during that request:
 +----------------+----------------------------------------------------------------+
 
 
-Logfile Location
+Log Destinations
 ----------------
+
+``ftw.structlog`` logs to a file by default, but can be configured to log to a
+Fluentd / Fluent Bit instance instead.
+
+
+Logging to file
+^^^^^^^^^^^^^^^
+
+By default, ``ftw.structlog`` will log to a local file with one JSON object
+per line.
 
 One logfile per Zope2 instance will be created, and its location and name
 will be derived from the instance's eventlog path. If the instance's eventlog
@@ -111,6 +121,17 @@ the root logger.
 
 When running tests in other projects, these errors can be muted by setting the
 environment variable ``FTW_STRUCTLOG_MUTE_SETUP_ERRORS=true``.
+
+Logging to Fluentd
+^^^^^^^^^^^^^^^^^^
+
+If the environment variable ``FLUENT_HOST`` is set, ``ftw.structlog`` will
+log to that fluent host using the Fluentd Forward Protocol, instead of
+logging to a local file. ``FLUENT_HOST`` (optional) allows to specify the
+port, and defaults to 24224 if not set.
+
+Currently, events will be tagged with a static tag ``ftw.structlog``, which
+may be used in Fluentd to route events.
 
 View Name
 ---------

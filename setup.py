@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.3.2.dev0'
+version = '1.4.0.dev0'
 
 tests_require = [
     'unittest2',
@@ -47,6 +47,7 @@ setup(name='ftw.structlog',
           'Zope2',
           'pytz',
           'tzlocal',
+          'fluent-logger < 0.10.0',
       ],
       tests_require=tests_require,
       extras_require=dict(tests=tests_require),
