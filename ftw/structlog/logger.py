@@ -36,7 +36,10 @@ def setup_logger():
 def setup_fluent_handler(fluent_host, fluent_port):
     """Set up handler that writes to a Fluentd / Fluent Bit instance.
     """
-    tag = 'ftw.structlog'
+    tag = 'structlog-json.log'
+    ns = os.environ.get('KUBERNETES_NAMESPACE')
+    if ns:
+        tag = '-'.join((ns, tag))
 
     handler = FluentHandler(tag, fluent_host, fluent_port)
     handler.setFormatter(FluentRecordFormatter())

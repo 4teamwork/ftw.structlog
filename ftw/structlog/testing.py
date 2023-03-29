@@ -1,6 +1,5 @@
 from App.config import getConfiguration
 from contextlib import contextmanager
-from ftw.structlog.logger import setup_logger
 from ftw.testbrowser import REQUESTS_BROWSER_FIXTURE
 from logging import getLogger
 from plone.app.testing import FunctionalTesting
@@ -24,6 +23,11 @@ def get_log_path():
     if logger.handlers:
         log_path = logger.handlers[0].stream.name
         return log_path
+
+
+def clear_log_handlers():
+    logger = logging.getLogger('ftw.structlog')
+    map(logger.removeHandler, logger.handlers)
 
 
 @contextmanager
@@ -164,15 +168,13 @@ class StructLogFluentLayer(PloneSandboxLayer):
 
     def setUp(self):
         os.environ['FLUENT_HOST'] = 'localhost'
-        setup_logger()
         super(StructLogFluentLayer, self).setUp()
 
     def tearDown(self):
         os.environ.pop('FLUENT_HOST', None)
 
         # Remove any log handlers that were set up
-        logger = logging.getLogger('ftw.structlog')
-        map(logger.removeHandler, logger.handlers)
+        clear_log_handlers()
         super(StructLogFluentLayer, self).tearDown()
 
 
