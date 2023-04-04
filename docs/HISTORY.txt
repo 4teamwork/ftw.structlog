@@ -5,7 +5,7 @@ Changelog
 1.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fluentd logging: Use K8s namespace in tag. [lgraf]
 
 
 1.4.0 (2023-02-01)

@@ -130,8 +130,8 @@ log to that fluent host using the Fluentd Forward Protocol, instead of
 logging to a local file. ``FLUENT_HOST`` (optional) allows to specify the
 port, and defaults to 24224 if not set.
 
-Currently, events will be tagged with a static tag ``ftw.structlog``, which
-may be used in Fluentd to route events.
+In order for ftw.structlog to use a proper tag for events logged to Fluentd,
+the Pod namespace needs to be exposed in the ``KUBERNETES_NAMESPACE`` env var.
 
 View Name
 ---------
